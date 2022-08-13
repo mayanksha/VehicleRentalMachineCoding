@@ -6,23 +6,29 @@ import com.navi.model.BookingToken;
 import com.navi.service.VehicleRentalService;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.InputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
 @Slf4j
 public class RentalSystemDriver {
-    final String ADD_BRANCH = "ADD_BRANCH";
-    final String BOOK = "BOOK";
-    final String ADD_VEHICLE = "ADD_VEHICLE";
-    final String DISPLAY_VEHICLES = "DISPLAY_VEHICLES";
+    final private String ADD_BRANCH = "ADD_BRANCH";
+    final private String BOOK = "BOOK";
+    final private String ADD_VEHICLE = "ADD_VEHICLE";
+    final private String DISPLAY_VEHICLES = "DISPLAY_VEHICLES";
 
     private VehicleRentalService rentalService = VehicleRentalService.getInstance();
 
-    public void driveProgramWithInputFile() {
-        InputStream inputStream = RentalSystemDriver.class.getClassLoader().getResourceAsStream("input3.txt");
-        Scanner lineScanner = new Scanner(inputStream);
+    private Scanner lineScanner;
 
+    public RentalSystemDriver(String filePath) throws FileNotFoundException {
+        File file = new File(filePath);
+        this.lineScanner = new Scanner(file);
+    }
+
+    public void driveProgramWithInputFile() {
         while (lineScanner.hasNextLine()) {
             Scanner scanner = new Scanner(lineScanner.nextLine());
             String command = scanner.next();
@@ -59,7 +65,7 @@ public class RentalSystemDriver {
             if (bookingToken == null) {
                 log.info("-1");
             } else {
-                log.info("{}", bookingToken.getPrice());
+                log.info("{}", Math.round(bookingToken.getPrice()));
             }
         } catch (DuplicateEntityException e) {
             log.error("Exception occurred. message: {}", e.getMessage());
@@ -88,7 +94,7 @@ public class RentalSystemDriver {
         String branchID = scanner.next();
         String vehicleTypes = scanner.next();
 
-        List<String> split = List.of(vehicleTypes.split(","));
+        List<String> split = Arrays.asList((vehicleTypes.split(",")));
 
         try {
             rentalService.createNewBranch(branchID);
